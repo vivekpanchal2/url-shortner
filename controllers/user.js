@@ -1,5 +1,6 @@
 const USER = require("../models/users");
 const URL = require("../models/url.js");
+const { getUser, setUser } = require("../service/auth");
 
 async function handleUserSignup(req, res) {
   const { userName, email, password } = req.body;
@@ -19,10 +20,15 @@ async function handleUserLogin(req, res) {
   });
   if (!user) {
     return res.render("login", {
-      error: "Invalid Username or password",
+      errors: "Invalid Username or password",
     });
   }
-  return res.render("/");
+
+  const token = await setUser(user);
+  // console.log(token);
+  res.cookie("uid", token);
+
+  return res.redirect("/");
 }
 
 module.exports = { handleUserSignup, handleUserLogin };
